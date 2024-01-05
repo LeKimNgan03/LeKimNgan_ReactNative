@@ -1,18 +1,20 @@
 import React, { useEffect, useState } from 'react';
-import { View, SafeAreaView, Image, Text, StyleSheet } from 'react-native';
+import {
+    View,
+    SafeAreaView,
+    Image,
+    Text,
+    StyleSheet
+} from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-// import AsyncStorage from '@react-native-async-storage/async-storage';
 import COLORS from '../consts/colors';
-// import perfumes from '../consts/perfumes';
-import axios from 'axios';
 
-const DetailsScreen = ({ navigation, route }) => {
+const DetailsScreen = ({ route, navigation }) => {
     // Create an Increment and Decrement Button
     const [amount, setAmount] = useState(1);
 
     // Add To Cart
-    const { item } = route.params;
-
     const addToCart = async (product) => {
         try {
             // Đọc giỏ hàng hiện tại từ AsyncStorage
@@ -31,6 +33,8 @@ const DetailsScreen = ({ navigation, route }) => {
         }
     };
 
+    const { item } = route.params;
+
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.white }}>
             <View style={style.header}>
@@ -39,7 +43,10 @@ const DetailsScreen = ({ navigation, route }) => {
             </View>
 
             <View style={style.imageContainer}>
-                <Image source={{ uri: item.image[0] }} style={{ resizeMode: 'contain', flex: 1 }} />
+                <Image
+                    source={{ uri: item.image }}
+                    style={{ resizeMode: 'contain', flex: 1 }}
+                />
             </View>
             <View style={style.detailsContainer}>
                 <View
@@ -49,7 +56,13 @@ const DetailsScreen = ({ navigation, route }) => {
                         justifyContent: 'space-between',
                         alignItems: 'center',
                     }}>
-                    <Text style={{ fontSize: 22, fontWeight: 'bold' }}>{item.title}</Text>
+                    <Text style={{
+                        fontSize: 22,
+                        fontWeight: 'bold',
+                        width: 250
+                    }}>
+                        {item.title}
+                    </Text>
                     <View style={style.priceTag}>
                         <Text
                             style={{
@@ -125,7 +138,6 @@ const style = StyleSheet.create({
         flex: 0.45,
         marginTop: 20,
         justifyContent: 'center',
-        alignItems: 'center',
     },
     detailsContainer: {
         flex: 0.55,

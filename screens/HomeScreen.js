@@ -12,7 +12,6 @@ import axios from 'axios';
 import { TextInput, TouchableOpacity } from 'react-native-gesture-handler';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import COLORS from '../consts/colors';
-// import perfumes from '../consts/perfumes';
 const width = Dimensions.get('window').width / 2 - 30;
 
 const HomeScreen = ({ navigation }) => {
@@ -25,7 +24,7 @@ const HomeScreen = ({ navigation }) => {
 
     const callAPI = () => {
         axios
-            .get('https://dummyjson.com/products')
+            .get('https://fakestoreapi.com/products')
             .then(function (response) {
                 setProducts(response.data);
             })
@@ -63,19 +62,53 @@ const HomeScreen = ({ navigation }) => {
         );
     };
 
+    const truncateTitle = (title) => {
+        const maxLines = 2;
+        const maxCharsPerLine = 12;
+        const lines = title.split('\n');
+        if (lines.length > maxLines) {
+            return lines.slice(0, maxLines).join('\n') + '...';
+        }
+
+        const chars = title.split('');
+        let currentLine = 0;
+        let currentChars = 0;
+        const truncatedChars = chars.reduce((acc, char) => {
+            if (char === '\n' || currentChars >= maxCharsPerLine) {
+                currentLine += 1;
+                currentChars = 0;
+            }
+
+            if (currentLine < maxLines) {
+                currentChars += 1;
+                return acc + char;
+            }
+
+            return acc;
+        }, '');
+
+        return truncatedChars;
+    };
+
+    const navigateToProductDetail = (item) => {
+        navigation.navigate('Details', { item });
+    };
+
     const Card = ({ item }) => (
         <TouchableOpacity
             activeOpacity={0.8}
-            onPress={() => navigation.navigate('Details', item)}>
+            onPress={() => navigateToProductDetail(item)}>
             <View style={style.card}>
-                <View style={{ height: 100, alignItems: 'center' }}>
-                    <Image
-                        source={{ uri: item.images[0] }}
-                        style={{ flex: 1, resizeMode: 'contain' }}
-                    />
-                </View>
+                <Image
+                    source={{ uri: item.image }}
+                    style={{
+                        flex: 1,
+                        resizeMode: 'contain',
+                        backgroundColor: '#fff',
+                        borderRadius: 10,
+                    }} />
                 <Text style={{ fontWeight: 'bold', fontSize: 17, marginTop: 10 }}>
-                    {item.title}
+                    {truncateTitle(item.title)}
                 </Text>
                 <View
                     style={{
@@ -90,6 +123,8 @@ const HomeScreen = ({ navigation }) => {
             </View>
         </TouchableOpacity>
     );
+
+    const keyExtractor = (item, index) => index.toString();
 
     return (
         <SafeAreaView
@@ -120,9 +155,10 @@ const HomeScreen = ({ navigation }) => {
                     marginTop: 10,
                     paddingBottom: 50,
                 }}
+                key={2}
                 data={products}
                 renderItem={Card}
-                keyExtractor={(item) => item.id}
+                keyExtractor={keyExtractor}
                 numColumns={2}
             />
         </SafeAreaView>

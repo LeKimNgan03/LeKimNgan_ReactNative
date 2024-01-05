@@ -9,6 +9,8 @@ import DetailsSceeen from './screens/DetailsScreen';
 import LoginScreen from './screens/LoginScreen';
 import RegisterScreen from './screens/RegisterScreen';
 import MyCartScreen from './screens/MyCartScreen';
+import ProfileScreen from './screens/ProfileScreen';
+
 import { StatusBar } from 'react-native';
 import COLORS from './consts/colors';
 
@@ -22,6 +24,7 @@ const App = () => {
         <Stack.Screen name="Home" component={HomeScreen} />
         <Stack.Screen name="Details" component={DetailsSceeen} />
         <Stack.Screen name="MyCart" component={MyCartScreen} />
+        <Stack.Screen name="Profile" component={ProfileScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

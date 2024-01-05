@@ -1,13 +1,22 @@
 import React, { useEffect, useState } from 'react';
-import { SafeAreaView, StyleSheet, View, Text, Image } from 'react-native';
+import {
+    SafeAreaView,
+    StyleSheet,
+    View,
+    Text,
+    Image,
+    TouchableOpacity
+} from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import COLORS from '../consts/colors';
-import perfumes from '../consts/perfumes';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+import { AntDesign } from '@expo/vector-icons';
 
 const CartScreen = ({ navigation }) => {
     const [cartItems, setCartItems] = useState([]);
+
     useEffect(() => {
         const loadCartItems = async () => {
             try {
@@ -49,6 +58,7 @@ const CartScreen = ({ navigation }) => {
                 console.error('Lỗi khi lưu giỏ hàng mới:', error);
             });
     };
+
     const handleDecreaseQuantity = (itemId) => {
         // Giảm số lượng của sản phẩm trong giỏ hàng
         const updatedCart = cartItems.map(item => {
@@ -91,6 +101,7 @@ const CartScreen = ({ navigation }) => {
                 console.error('Lỗi khi lưu giỏ hàng mới:', error);
             });
     };
+
     const handleReduceQuantity = (itemId) => {
         // Giảm số lượng của sản phẩm trong giỏ hàng
         const updatedCart = cartItems.map(item => {
@@ -114,95 +125,171 @@ const CartScreen = ({ navigation }) => {
             });
     };
 
-    const CartCard = ({ perfume }) => {
-        return (
-            <View style={style.cartCard}>
-                <Icon name="delete" size={25} />
-                <Image
-                    onPress={() => navigation.navigate('Details', perfume)}
-                    source={perfume.img}
-                    style={{ height: 80, width: 80 }} />
-                <View
-                    onPress={() => navigation.navigate('Details', perfume)}
-                    style={{
-                        height: 100,
-                        marginLeft: 10,
-                        paddingVertical: 20,
-                        flex: 1,
-                    }}>
-                    <Text style={{ fontWeight: 'bold', fontSize: 16 }}>{perfume.name}</Text>
-                    <Text style={{ fontSize: 17, fontWeight: 'bold' }}>${perfume.price}</Text>
-                </View>
-                <View style={{ marginRight: 20, alignItems: 'center' }}>
-                    <View style={style.actionBtn}>
-                        <Icon name="remove" size={25} color={COLORS.main} />
-                        <Text style={{ fontWeight: 'bold', fontSize: 18, paddingLeft: 8, paddingRight: 8 }}>3</Text>
-                        <Icon name="add" size={25} color={COLORS.main} />
-                    </View>
-                </View>
-            </View>
-        );
-    };
     return (
-        <SafeAreaView style={{ backgroundColor: COLORS.white, flex: 1 }}>
-            <View style={style.header}>
+        <SafeAreaView style={styles.container}>
+            <View style={styles.header}>
                 <Icon name="arrow-back-ios" size={28} onPress={navigation.goBack} />
-                <Text style={{ fontSize: 20, fontWeight: 'bold' }}>Cart</Text>
+                <Text style={styles.titleHeader}>Your Cart</Text>
             </View>
-            <FlatList
-                showsVerticalScrollIndicator={false}
-                contentContainerStyle={{ paddingBottom: 80 }}
-                // data={perfumes}
-                data={cartItems}
-                renderItem={({ item }) => <CartCard perfume={item} />}
-                ListFooterComponentStyle={{ paddingHorizontal: 20, marginTop: 20 }}
-                ListFooterComponent={() => (
-                    <View>
-                        <View
-                            style={{
-                                flexDirection: 'row',
-                                justifyContent: 'space-between',
-                                marginVertical: 15,
-                            }}>
-                            <Text style={{ fontSize: 18, fontWeight: 'bold' }}>
-                                Total Price
-                            </Text>
-                            <Text style={{ fontSize: 18, fontWeight: 'bold' }}>$50</Text>
-                        </View>
-                    </View>
+
+            <View style={styles.body}>
+                {cartItems.length > 0 ? (
+                    <FlatList
+                        data={cartItems}
+                        keyExtractor={(item) => item.id.toString()}
+                        renderItem={({ item }) => (
+                            <View style={styles.cartItem}>
+                                <Image source={{ uri: item.image }} style={styles.productImage} />
+                                <View style={styles.productDetails}>
+                                    <Text style={styles.title}>{item.title}</Text>
+                                    <Text style={styles.price}>Price: ${item.price}</Text>
+
+                                    <View style={styles.actionButtons}>
+                                        <View style={styles.action}>
+                                            <View style={styles.congtru}>
+                                                <TouchableOpacity onPress={() => handleDecreaseQuantity(item.id)}>
+                                                    <AntDesign name="minus" size={18} color="black" />
+                                                </TouchableOpacity>
+                                            </View>
+                                            <Text style={styles.quantity}>{item.quantity}</Text>
+                                            <View style={styles.congtru}>
+                                                <TouchableOpacity onPress={() => handleIncreaseQuantity(item.id)}>
+                                                    <AntDesign name="plus" size={18} color="black" />
+                                                </TouchableOpacity>
+                                            </View>
+                                        </View>
+                                    </View>
+
+                                    <TouchableOpacity onPress={() => handleDeleteItem(item.id)}>
+                                        <Icon name="delete" style={{
+                                            fontSize: 20,
+                                            marginTop: 10,
+                                        }} />
+                                    </TouchableOpacity>
+                                </View>
+                            </View>
+                        )}
+                    />
+                ) : (
+                    <Text style={styles.emptyCartText}>Your Cart is empty</Text>
                 )}
-            />
+                <View style={styles.totalContainer}>
+                    <Text style={styles.totalText}>Total:</Text>
+                    <Text style={styles.totalPrice}>${calculateTotalPrice()}</Text>
+                </View>
+                <TouchableOpacity style={styles.paymentButton}>
+                    <Text style={styles.paymentButtonText}>Payment</Text>
+                </TouchableOpacity>
+            </View>
         </SafeAreaView>
     );
 };
 
-const style = StyleSheet.create({
+const styles = StyleSheet.create({
+    container: {
+        backgroundColor: COLORS.white,
+        flex: 1,
+    },
     header: {
         paddingVertical: 20,
+        marginHorizontal: 20,
         flexDirection: 'row',
         alignItems: 'center',
-        marginHorizontal: 20,
     },
-    cartCard: {
+    titleHeader: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        textAlign: 'center',
+    },
+    cartItem: {
+        flexDirection: 'row',
+        borderColor: 'gray',
+        padding: 8,
+        marginBottom: 8,
+        borderBottomColor: 'black',
+        borderBottomWidth: 0.2,
+    },
+    productImage: {
+        width: 100,
         height: 100,
-        elevation: 15,
-        borderRadius: 10,
-        backgroundColor: COLORS.white,
-        marginVertical: 10,
-        marginHorizontal: 20,
-        paddingHorizontal: 10,
+        resizeMode: 'center',
+        marginRight: 8,
+    },
+    productDetails: {
+        flex: 1,
+    },
+    title: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        marginBottom: 4,
+    },
+    price: {
+        fontSize: 14,
+        color: '#F15B31',
+    },
+    quantity: {
+        fontSize: 14,
+        color: 'gray',
+        textAlign: 'center',
+        borderRightWidth: 0.6,
+        borderLeftWidth: 0.6,
+        borderColor: '#EEEEEE',
+        width: 50,
+        height: 20,
+    },
+    congtru: {
+        textAlign: 'center',
+        padding: 2,
+    },
+    action: {
         flexDirection: 'row',
+        justifyContent: 'space-around',
+        borderWidth: 1,
+        borderColor: '#EEEEEE',
+        width: 100,
+        height: 25,
+    },
+    actionButtons: {
+        marginTop: 10,
+        justifyContent: 'space-around',
+        height: 20,
+    },
+    actionButtonText: {
+        color: 'blue',
+    },
+    body: {
+        paddingVertical: 20,
+        marginHorizontal: 20,
+    },
+    totalContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginTop: 10,
+    },
+    totalText: {
+        fontSize: 18,
+        fontWeight: 'bold',
+    },
+    totalPrice: {
+        fontSize: 18,
+        color: COLORS.main,
+        fontWeight: 'bold',
+    },
+    paymentButton: {
+        backgroundColor: COLORS.main,
+        padding: 10,
+        borderRadius: 10,
+        marginTop: 10,
         alignItems: 'center',
     },
-    actionBtn: {
-        width: 80,
-        height: 30,
-        backgroundColor: COLORS.primary,
-        borderRadius: 30,
-        paddingHorizontal: 5,
-        flexDirection: 'row',
-        justifyContent: 'center',
-        alignContent: 'center',
+    paymentButtonText: {
+        color: 'white',
+        fontWeight: 'bold',
+    },
+    emptyCartText: {
+        fontSize: 18,
+        textAlign: 'center',
+        color: 'gray',
     },
 });
 
