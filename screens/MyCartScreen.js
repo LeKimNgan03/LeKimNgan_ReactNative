@@ -210,9 +210,9 @@ const styles = StyleSheet.create({
         borderBottomWidth: 0.2,
     },
     productImage: {
-        width: 100,
-        height: 100,
-        resizeMode: 'center',
+        flex: 1,
+        resizeMode: 'contain',
+        borderRadius: 10,
         marginRight: 8,
     },
     productDetails: {
@@ -228,7 +228,7 @@ const styles = StyleSheet.create({
         color: '#F15B31',
     },
     quantity: {
-        fontSize: 14,
+        fontSize: 18,
         color: 'gray',
         textAlign: 'center',
         borderRightWidth: 0.6,

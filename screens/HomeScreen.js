@@ -9,9 +9,11 @@ import {
     Dimensions,
 } from 'react-native';
 import axios from 'axios';
-import { TextInput, TouchableOpacity } from 'react-native-gesture-handler';
+import { ScrollView, TextInput, TouchableOpacity } from 'react-native-gesture-handler';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import COLORS from '../consts/colors';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import Slider from '../components/slider';
 const width = Dimensions.get('window').width / 2 - 30;
 
 const HomeScreen = ({ navigation }) => {
@@ -35,6 +37,8 @@ const HomeScreen = ({ navigation }) => {
                 console.log('Finally called');
             });
     };
+
+    // Search
 
     // Get Category
     const [catergoryIndex, setCategoryIndex] = React.useState(0);
@@ -62,6 +66,7 @@ const HomeScreen = ({ navigation }) => {
         );
     };
 
+    // Set Title
     const truncateTitle = (title) => {
         const maxLines = 2;
         const maxCharsPerLine = 12;
@@ -90,10 +95,12 @@ const HomeScreen = ({ navigation }) => {
         return truncatedChars;
     };
 
+    // Navigate
     const navigateToProductDetail = (item) => {
         navigation.navigate('Details', { item });
     };
 
+    // Card Item
     const Card = ({ item }) => (
         <TouchableOpacity
             activeOpacity={0.8}
@@ -128,39 +135,51 @@ const HomeScreen = ({ navigation }) => {
 
     return (
         <SafeAreaView
-            style={{ flex: 1, paddingHorizontal: 20, backgroundColor: COLORS.white }}>
-            <View style={style.header}>
-                <View>
-                    <Text style={{ fontSize: 25, fontWeight: 'bold' }}>Welcome to</Text>
-                    <Text style={{ fontSize: 38, color: COLORS.main, fontWeight: 'bold' }}>
-                        Shopping Store
-                    </Text>
+            style={{
+                flex: 1, paddingHorizontal: 20, backgroundColor: COLORS.white
+            }}>
+            <ScrollView>
+                <View style={style.header}>
+                    <View>
+                        <MaterialCommunityIcons name="account" size={28} onPress={() => navigation.navigate('Profile')} />
+                    </View>
+                    <View style={style.logo}>
+                        <Text style={{ fontSize: 25, fontWeight: 'bold' }}>Welcome to</Text>
+                        <Text style={{ fontSize: 38, color: COLORS.main, fontWeight: 'bold' }}>
+                            Shopping Store
+                        </Text>
+                    </View>
+                    <View>
+                        <Icon name="shopping-cart" size={28} onPress={() => navigation.navigate('MyCart')} />
+                    </View>
                 </View>
-                <Icon name="shopping-cart" size={28} onPress={() => navigation.navigate('MyCart')} />
-            </View>
-            <View style={{ marginTop: 30, flexDirection: 'row' }}>
-                <View style={style.searchContainer}>
-                    <Icon name="search" size={25} style={{ marginLeft: 20 }} />
-                    <TextInput placeholder="Search" style={style.input} />
+                <View style={{ marginTop: 30, flexDirection: 'row' }}>
+                    <View style={style.searchContainer}>
+                        {/* <Icon name="search" size={25} style={{ marginLeft: 20 }} /> */}
+                        <TextInput
+                            placeholder="Search"
+                            style={style.input} />
+                    </View>
+                    <View style={style.sortBtn}>
+                        <Icon name="search" size={25} color={COLORS.white} onPress={() => navigation.navigate('Search')} />
+                    </View>
                 </View>
-                <View style={style.sortBtn}>
-                    <Icon name="sort" size={30} color={COLORS.white} />
-                </View>
-            </View>
-            <CategoryList />
-            <FlatList
-                columnWrapperStyle={{ justifyContent: 'space-between' }}
-                showsVerticalScrollIndicator={false}
-                contentContainerStyle={{
-                    marginTop: 10,
-                    paddingBottom: 50,
-                }}
-                key={2}
-                data={products}
-                renderItem={Card}
-                keyExtractor={keyExtractor}
-                numColumns={2}
-            />
+                <Slider />
+                <CategoryList />
+                <FlatList
+                    columnWrapperStyle={{ justifyContent: 'space-between' }}
+                    showsVerticalScrollIndicator={false}
+                    contentContainerStyle={{
+                        marginTop: 10,
+                        paddingBottom: 50,
+                    }}
+                    key={2}
+                    data={products}
+                    renderItem={Card}
+                    keyExtractor={keyExtractor}
+                    numColumns={2}
+                />
+            </ScrollView>
         </SafeAreaView>
     );
 };
@@ -168,11 +187,15 @@ const HomeScreen = ({ navigation }) => {
 const style = StyleSheet.create({
     categoryContainer: {
         flexDirection: 'row',
-        marginTop: 30,
+        marginTop: 10,
         marginBottom: 20,
         justifyContent: 'space-between',
     },
-    categoryText: { fontSize: 16, color: 'grey', fontWeight: 'bold' },
+    categoryText: {
+        fontSize: 16,
+        color: 'grey',
+        fontWeight: 'bold'
+    },
     categoryTextSelected: {
         color: COLORS.main,
         paddingBottom: 5,
@@ -188,10 +211,26 @@ const style = StyleSheet.create({
         marginBottom: 20,
         padding: 15,
     },
+    slider: {
+        alignItems: 'center',
+    },
+    slide: {
+        width: 400,
+        height: 200,
+        borderRadius: 10,
+        overflow: 'hidden',
+    },
+    slideImage: {
+        width: '100%',
+        height: '100%',
+    },
     header: {
         marginTop: 30,
         flexDirection: 'row',
-        justifyContent: 'space-between',
+        justifyContent: 'space-evenly',
+    },
+    logo: {
+        alignItems: 'center',
     },
     searchContainer: {
         height: 50,
@@ -202,6 +241,7 @@ const style = StyleSheet.create({
         alignItems: 'center',
     },
     input: {
+        marginLeft: 20,
         fontSize: 18,
         fontWeight: 'bold',
         flex: 1,

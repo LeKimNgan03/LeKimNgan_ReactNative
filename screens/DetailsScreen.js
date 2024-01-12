@@ -10,9 +10,77 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import COLORS from '../consts/colors';
 
+import { AntDesign } from '@expo/vector-icons';
+
 const DetailsScreen = ({ route, navigation }) => {
     // Create an Increment and Decrement Button
-    const [amount, setAmount] = useState(1);
+    const [cartItems, setCartItems] = useState([]);
+
+    useEffect(() => {
+        const loadCartItems = async () => {
+            try {
+                const cartData = await AsyncStorage.getItem('cart');
+                if (cartData) {
+                    const parsedCart = JSON.parse(cartData);
+
+                    // Kiểm tra và đặt số lượng thành 1 nếu nó là 0 hoặc không tồn tại
+                    const updatedCart = parsedCart.map(item => ({
+                        ...item,
+                        quantity: item.quantity || 1,
+                    }));
+
+                    setCartItems(updatedCart);
+                }
+            } catch (error) {
+                console.error('Lỗi khi đọc dữ liệu giỏ hàng:', error);
+            }
+        };
+
+        loadCartItems();
+    }, []);
+
+    const handleDecreaseQuantity = (itemId) => {
+        // Giảm số lượng của sản phẩm trong giỏ hàng
+        const updatedCart = cartItems.map(item => {
+            if (item.id === itemId) {
+                // Đảm bảo số lượng không nhỏ hơn 1
+                const newQuantity = Math.max(1, item.quantity - 1);
+                return { ...item, quantity: newQuantity };
+            }
+            return item;
+        });
+
+        setCartItems(updatedCart);
+
+        // Lưu giỏ hàng mới vào AsyncStorage
+        AsyncStorage.setItem('cart', JSON.stringify(updatedCart))
+            .then(() => {
+                console.log('Số lượng sản phẩm đã được giảm');
+            })
+            .catch((error) => {
+                console.error('Lỗi khi lưu giỏ hàng mới:', error);
+            });
+    };
+
+    const handleIncreaseQuantity = (itemId) => {
+        // Tăng số lượng của sản phẩm trong giỏ hàng
+        const updatedCart = cartItems.map(item => {
+            if (item.id === itemId) {
+                return { ...item, quantity: item.quantity + 1 };
+            }
+            return item;
+        });
+        setCartItems(updatedCart);
+
+        // Lưu giỏ hàng mới vào AsyncStorage
+        AsyncStorage.setItem('cart', JSON.stringify(updatedCart))
+            .then(() => {
+                console.log('Số lượng sản phẩm đã được tăng');
+            })
+            .catch((error) => {
+                console.error('Lỗi khi lưu giỏ hàng mới:', error);
+            });
+    };
 
     // Add To Cart
     const addToCart = async (product) => {
@@ -97,8 +165,8 @@ const DetailsScreen = ({ route, navigation }) => {
                                 flexDirection: 'row',
                                 alignItems: 'center',
                             }}>
-                            <View style={style.borderBtn}>
-                                <Text style={style.borderBtnText}>-</Text>
+                            <View style={style.borderBtn} onPress={() => handleDecreaseQuantity(item.id)}>
+                                <AntDesign name="minus" size={18} color="black" />
                             </View>
                             <Text
                                 style={{
@@ -106,10 +174,10 @@ const DetailsScreen = ({ route, navigation }) => {
                                     marginHorizontal: 10,
                                     fontWeight: 'bold',
                                 }}>
-                                {amount}
+                                1
                             </Text>
-                            <View style={style.borderBtn}>
-                                <Text style={style.borderBtnText}>+</Text>
+                            <View style={style.borderBtn} onPress={() => handleIncreaseQuantity(item.id)}>
+                                <AntDesign name="plus" size={18} color="black" />
                             </View>
                         </View>
 
