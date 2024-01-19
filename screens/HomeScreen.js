@@ -43,7 +43,7 @@ const HomeScreen = ({ navigation }) => {
     // Get Category
     const [catergoryIndex, setCategoryIndex] = React.useState(0);
 
-    const categories = ['POPULAR', 'NEW', 'SALE', 'OTHERS'];
+    const categories = ['ALL', 'CLOTHING', 'JEWELERY', 'ELECTRONICS'];
 
     const CategoryList = () => {
         return (
@@ -69,7 +69,7 @@ const HomeScreen = ({ navigation }) => {
     // Set Title
     const truncateTitle = (title) => {
         const maxLines = 2;
-        const maxCharsPerLine = 12;
+        const maxCharsPerLine = 10;
         const lines = title.split('\n');
         if (lines.length > maxLines) {
             return lines.slice(0, maxLines).join('\n') + '...';
@@ -155,13 +155,12 @@ const HomeScreen = ({ navigation }) => {
                 </View>
                 <View style={{ marginTop: 30, flexDirection: 'row' }}>
                     <View style={style.searchContainer}>
-                        {/* <Icon name="search" size={25} style={{ marginLeft: 20 }} /> */}
-                        <TextInput
-                            placeholder="Search"
-                            style={style.input} />
-                    </View>
-                    <View style={style.sortBtn}>
-                        <Icon name="search" size={25} color={COLORS.white} onPress={() => navigation.navigate('Search')} />
+                        <Text onPress={() => navigation.navigate('Search')} style={style.input}>
+                            Search
+                        </Text>
+                        <View style={style.sortBtn}>
+                            <Icon name="search" size={25} color={COLORS.white} onPress={() => navigation.navigate('Search')} />
+                        </View>
                     </View>
                 </View>
                 <Slider />
@@ -245,7 +244,7 @@ const style = StyleSheet.create({
         fontSize: 18,
         fontWeight: 'bold',
         flex: 1,
-        color: COLORS.dark,
+        color: 'grey',
     },
     sortBtn: {
         marginLeft: 10,

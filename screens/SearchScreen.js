@@ -14,19 +14,30 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import COLORS from '../consts/colors';
 const width = Dimensions.get('window').width / 2 - 30;
 
-const HomeScreen = ({ navigation }) => {
+const SearchScreen = ({ navigation }) => {
     // Call API
-    const [products, setProducts] = useState([]);
+    // const [products, setProducts] = useState([]);
+
+    const [filterData, setFilterData] = useState([]);
+    const [masterData, setMasterData] = useState([]);
+    const [search, setSearch] = useState("");
 
     useEffect(() => {
         callAPI();
+        return () => {
+
+        }
     }, []);
 
     const callAPI = () => {
         axios
             .get('https://fakestoreapi.com/products')
-            .then(function (response) {
-                setProducts(response.data);
+            // .then(function (response) {
+            //     setProducts(response.data);
+            // })
+            .then(function (responseJson) {
+                setFilterData(responseJson.data);
+                setMasterData(responseJson.data);
             })
             .catch(function (error) {
                 alert(error.message);
@@ -35,6 +46,23 @@ const HomeScreen = ({ navigation }) => {
                 console.log('Finally called');
             });
     };
+
+    const searchFilter = (text) => {
+        if (text) {
+            const newData = masterData.filter((item) => {
+                const itemData = item.title
+                    ? item.title.toUpperCase()
+                    : ''.toUpperCase();
+                const textData = text.toUpperCase();
+                return itemData.indexOf(textData) > -1;
+            });
+            setFilterData(newData);
+            setSearch(text);
+        } else {
+            setFilterData(masterData);
+            setSearch(text);
+        }
+    }
 
     // Set Title
     const truncateTitle = (title) => {
@@ -103,9 +131,6 @@ const HomeScreen = ({ navigation }) => {
 
     const keyExtractor = (item, index) => index.toString();
 
-    // Search
-    const [input, setInput] = useState("");
-
     return (
         <SafeAreaView
             style={{
@@ -115,15 +140,14 @@ const HomeScreen = ({ navigation }) => {
                 <View style={{ marginTop: 30, flexDirection: 'row' }}>
                     <Icon name="arrow-back-ios" size={25} onPress={navigation.goBack} style={style.goBack} />
                     <View style={style.searchContainer}>
-                        {/* <Icon name="search" size={25} style={{ marginLeft: 20 }} /> */}
                         <TextInput
-                            value={input}
-                            onChangeText={(text) => setInput(text)}
+                            value={search}
+                            onChangeText={(text) => searchFilter(text)}
                             placeholder="Search"
                             style={style.input} />
-                    </View>
-                    <View style={style.sortBtn}>
-                        <Icon name="search" size={25} color={COLORS.white} />
+                        <View style={style.sortBtn}>
+                            <Icon name="search" size={25} color={COLORS.white} />
+                        </View>
                     </View>
                 </View>
                 <FlatList
@@ -134,7 +158,7 @@ const HomeScreen = ({ navigation }) => {
                         paddingBottom: 50,
                     }}
                     key={2}
-                    data={products}
+                    data={filterData}
                     renderItem={Card}
                     keyExtractor={keyExtractor}
                     numColumns={2}
@@ -170,7 +194,6 @@ const style = StyleSheet.create({
         color: COLORS.dark,
     },
     sortBtn: {
-        marginLeft: 10,
         height: 50,
         width: 50,
         borderRadius: 10,
@@ -184,4 +207,4 @@ const style = StyleSheet.create({
     },
 });
 
-export default HomeScreen;
+export default SearchScreen;

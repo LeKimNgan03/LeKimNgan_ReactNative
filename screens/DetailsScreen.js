@@ -4,8 +4,10 @@ import {
     SafeAreaView,
     Image,
     Text,
-    StyleSheet
+    StyleSheet,
+    ScrollView
 } from 'react-native';
+// import { ScrollView } from 'react-native-gesture-handler';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import COLORS from '../consts/colors';
@@ -203,12 +205,12 @@ const style = StyleSheet.create({
         justifyContent: 'space-between',
     },
     imageContainer: {
-        flex: 0.45,
+        flex: 0.55,
         marginTop: 20,
         justifyContent: 'center',
     },
     detailsContainer: {
-        flex: 0.55,
+        flex: 1,
         backgroundColor: COLORS.light,
         marginHorizontal: 7,
         marginBottom: 7,
@@ -232,7 +234,10 @@ const style = StyleSheet.create({
         width: 60,
         height: 40,
     },
-    borderBtnText: { fontWeight: 'bold', fontSize: 28 },
+    borderBtnText: {
+        fontWeight: 'bold',
+        fontSize: 28
+    },
     buyBtn: {
         width: 130,
         height: 50,

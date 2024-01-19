@@ -125,6 +125,15 @@ const CartScreen = ({ navigation }) => {
             });
     };
 
+    const handleSubmit = async () => {
+        const existingCart = await AsyncStorage.getItem('cart');
+        if (existingCart) {
+            await AsyncStorage.setItem('cart', JSON.stringify([]));
+            setCartItems([]);
+            alert("Thanh toán thành công!");
+        }
+    }
+
     return (
         <SafeAreaView style={styles.container}>
             <View style={styles.header}>
@@ -177,7 +186,7 @@ const CartScreen = ({ navigation }) => {
                     <Text style={styles.totalText}>Total:</Text>
                     <Text style={styles.totalPrice}>${calculateTotalPrice()}</Text>
                 </View>
-                <TouchableOpacity style={styles.paymentButton}>
+                <TouchableOpacity style={styles.paymentButton} onPress={() => handleSubmit()}>
                     <Text style={styles.paymentButtonText}>Payment</Text>
                 </TouchableOpacity>
             </View>
