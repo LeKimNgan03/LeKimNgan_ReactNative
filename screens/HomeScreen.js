@@ -38,8 +38,6 @@ const HomeScreen = ({ navigation }) => {
             });
     };
 
-    // Search
-
     // Get Category
     const [catergoryIndex, setCategoryIndex] = React.useState(0);
 

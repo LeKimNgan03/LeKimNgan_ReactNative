@@ -7,11 +7,9 @@ import {
     StyleSheet,
     ScrollView
 } from 'react-native';
-// import { ScrollView } from 'react-native-gesture-handler';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import COLORS from '../consts/colors';
-
 import { AntDesign } from '@expo/vector-icons';
 
 const DetailsScreen = ({ route, navigation }) => {
@@ -85,6 +83,7 @@ const DetailsScreen = ({ route, navigation }) => {
     };
 
     // Add To Cart
+    const { item } = route.params;
     const addToCart = async (product) => {
         try {
             // Đọc giỏ hàng hiện tại từ AsyncStorage
@@ -92,18 +91,24 @@ const DetailsScreen = ({ route, navigation }) => {
             const cart = existingCart ? JSON.parse(existingCart) : [];
 
             // Thêm sản phẩm vào giỏ hàng
-            cart.push(product);
+            const existingProductIndex = cart.findIndex(
+                (item) => item.id === product.id
+            );
 
-            // Lưu giỏ hàng mới vào AsyncStorage
-            await AsyncStorage.setItem('cart', JSON.stringify(cart));
+            if (existingProductIndex >= 0) {
+                cart[existingProductIndex].quantity += 1;
+            } else {
+                product.quantity = 1;
+                cart.push(product);
+            }
 
-            console.log('Thêm sản phẩm thành công!');
+            // Lưu giỏ hàng mới vào AsyncStorage
+            await AsyncStorage.setItem("cart", JSON.stringify(cart));
+            console.log("Thành công", "Thêm vào giỏ hàng thành công!");
         } catch (error) {
-            console.error('Lỗi khi thêm vào giỏ hàng:', error);
+            console.error("Lỗi khi thêm vào giỏ hàng:", error);
         }
     };
-
-    const { item } = route.params;
 
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.white }}>
